@@ -1,0 +1,1807 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SBTI 人格测试 - 科学扯淡型人格指标</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0f0c29;
+            --bg-mid: #302b63;
+            --bg-light: #24243e;
+            --accent-pink: #ff6b9d;
+            --accent-cyan: #00d4ff;
+            --accent-purple: #b347d9;
+            --accent-yellow: #ffd166;
+            --accent-green: #06d6a0;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.45);
+            --shadow-glow: 0 0 40px rgba(255, 107, 157, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-deep);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ===== 动态背景 ===== */
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 0;
+            animation: orbFloat 20s infinite ease-in-out;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--accent-pink), transparent 70%);
+            top: -10%;
+            left: -10%;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--accent-purple), transparent 70%);
+            bottom: -10%;
+            right: -10%;
+            animation-delay: -7s;
+        }
+
+        .orb-3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, var(--accent-cyan), transparent 70%);
+            top: 40%;
+            left: 50%;
+            animation-delay: -14s;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
+        /* 星空粒子 */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle 3s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 0.8; transform: scale(1.2); }
+        }
+
+        /* ===== 布局容器 ===== */
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== 玻璃卡片 ===== */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 var(--glass-highlight);
+        }
+
+        /* ===== 页面系统 ===== */
+        .page {
+            display: none;
+            animation: pageEnter 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes pageEnter {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .page-exit {
+            animation: pageExit 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes pageExit {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 0; transform: translateY(-20px) scale(0.98); }
+        }
+
+        /* ===== 首页 ===== */
+        .home-page {
+            text-align: center;
+        }
+
+        .home-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: rgba(255, 107, 157, 0.15);
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            border-radius: 100px;
+            font-size: 0.85rem;
+            color: var(--accent-pink);
+            margin-bottom: 32px;
+            animation: fadeUp 0.8s ease-out 0.2s both;
+        }
+
+        .home-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent-pink);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-pink);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.8); }
+        }
+
+        .logo-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 16px;
+            animation: fadeUp 0.8s ease-out 0.3s both;
+        }
+
+        .logo {
+            font-size: clamp(4rem, 12vw, 6.5rem);
+            font-weight: 900;
+            letter-spacing: 12px;
+            background: linear-gradient(135deg, var(--accent-pink) 0%, var(--accent-purple) 50%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            position: relative;
+            filter: drop-shadow(0 0 30px rgba(255, 107, 157, 0.3));
+        }
+
+        .logo-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 107, 157, 0.4), transparent 70%);
+            filter: blur(40px);
+            z-index: -1;
+            animation: glowPulse 4s infinite ease-in-out;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            color: var(--text-secondary);
+            font-weight: 300;
+            margin-bottom: 8px;
+            animation: fadeUp 0.8s ease-out 0.4s both;
+        }
+
+        .subtitle-en {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 40px;
+            animation: fadeUp 0.8s ease-out 0.5s both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .letters-row {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            animation: fadeUp 0.8s ease-out 0.6s both;
+        }
+
+        .letter-card {
+            width: 80px;
+            height: 100px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .letter-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-pink), var(--accent-purple));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .letter-card:hover {
+            transform: translateY(-8px) scale(1.05);
+            border-color: var(--glass-highlight);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 107, 157, 0.1);
+        }
+
+        .letter-card:hover::before {
+            opacity: 1;
+        }
+
+        .letter-card .lt {
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .letter-card .lm {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .home-desc {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            animation: fadeUp 0.8s ease-out 0.7s both;
+        }
+
+        .btn-glow {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 48px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+            border: none;
+            border-radius: 100px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 8px 30px rgba(255, 107, 157, 0.3);
+            animation: fadeUp 0.8s ease-out 0.8s both;
+            overflow: hidden;
+        }
+
+        .btn-glow::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-glow:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 107, 157, 0.4);
+        }
+
+        .btn-glow:hover::before {
+            left: 100%;
+        }
+
+        .btn-glow:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .btn-arrow {
+            transition: transform 0.3s;
+        }
+
+        .btn-glow:hover .btn-arrow {
+            transform: translateX(4px);
+        }
+
+        .warning-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 24px;
+            padding: 10px 20px;
+            background: rgba(255, 209, 102, 0.1);
+            border: 1px solid rgba(255, 209, 102, 0.2);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            color: var(--accent-yellow);
+            animation: fadeUp 0.8s ease-out 0.9s both;
+        }
+
+        /* ===== 答题页 ===== */
+        .quiz-page .quiz-card {
+            padding: 40px;
+        }
+
+        .quiz-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .quiz-step {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .quiz-step span {
+            color: var(--accent-pink);
+            font-weight: 700;
+        }
+
+        .progress-track {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            margin: 0 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-pink), var(--accent-purple));
+            border-radius: 10px;
+            transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 0 10px rgba(255, 107, 157, 0.3);
+        }
+
+        .question-area {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .q-emoji {
+            font-size: 4rem;
+            display: inline-block;
+            margin-bottom: 20px;
+            animation: emojiPop 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+        }
+
+        @keyframes emojiPop {
+            from { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+            to { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+
+        .q-text {
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            font-weight: 700;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            width: 100%;
+            padding: 20px 24px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .opt-btn::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 0;
+            background: linear-gradient(90deg, rgba(255, 107, 157, 0.2), transparent);
+            transition: width 0.3s;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 107, 157, 0.3);
+            color: var(--text-primary);
+            transform: translateX(4px);
+        }
+
+        .opt-btn:hover::before {
+            width: 100%;
+        }
+
+        .opt-btn:active {
+            transform: translateX(4px) scale(0.99);
+        }
+
+        .opt-btn.chosen {
+            background: rgba(255, 107, 157, 0.08);
+            border-color: rgba(255, 107, 157, 0.4);
+            color: var(--text-primary);
+        }
+
+        .opt-btn.chosen .opt-index {
+            background: rgba(255, 107, 157, 0.2);
+            border-color: rgba(255, 107, 157, 0.5);
+            color: var(--accent-pink);
+        }
+
+        .opt-index {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            transition: all 0.3s;
+        }
+
+        .opt-btn:hover .opt-index {
+            background: rgba(255, 107, 157, 0.15);
+            border-color: rgba(255, 107, 157, 0.3);
+            color: var(--accent-pink);
+        }
+
+        .opt-text {
+            position: relative;
+            z-index: 1;
+            line-height: 1.5;
+        }
+
+        /* 答题导航 */
+        .quiz-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 22px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        .nav-btn:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+
+        .nav-btn.nav-submit {
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 0 24px rgba(255, 107, 157, 0.4), 0 4px 16px rgba(179, 71, 217, 0.3);
+            animation: submitPulse 2s infinite;
+            font-size: 1rem;
+            padding: 14px 28px;
+        }
+
+        .nav-btn.nav-submit:hover {
+            background: linear-gradient(135deg, #ff85b0, #c85fed);
+            box-shadow: 0 0 36px rgba(255, 107, 157, 0.6), 0 6px 24px rgba(179, 71, 217, 0.4);
+            transform: translateY(-3px);
+            color: white;
+        }
+
+        .nav-btn.nav-submit:active {
+            transform: scale(0.96);
+        }
+
+        @keyframes submitPulse {
+            0%, 100% { box-shadow: 0 0 24px rgba(255, 107, 157, 0.4), 0 4px 16px rgba(179, 71, 217, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(255, 107, 157, 0.7), 0 4px 24px rgba(179, 71, 217, 0.5); }
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .nav-dots {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 300px;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .nav-dot:hover {
+            background: rgba(255, 107, 157, 0.3);
+        }
+
+        .nav-dot.done {
+            background: rgba(6, 214, 160, 0.4);
+        }
+
+        .nav-dot.current {
+            background: var(--accent-pink);
+            box-shadow: 0 0 8px rgba(255, 107, 157, 0.5);
+        }
+
+        /* 点击涟漪 */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 107, 157, 0.3);
+            transform: scale(0);
+            animation: rippleAnim 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes rippleAnim {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* ===== 加载页 ===== */
+        .loading-page {
+            text-align: center;
+        }
+
+        .loading-inner {
+            padding: 60px 40px;
+        }
+
+        .loader-ring {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 40px;
+        }
+
+        .loader-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .loader-ring circle {
+            fill: none;
+            stroke-width: 4;
+        }
+
+        .loader-track {
+            stroke: rgba(255, 255, 255, 0.08);
+        }
+
+        .loader-fill {
+            stroke: url(#loaderGradient);
+            stroke-linecap: round;
+            stroke-dasharray: 283;
+            stroke-dashoffset: 283;
+            animation: loaderSpin 2s linear infinite;
+        }
+
+        @keyframes loaderSpin {
+            0% { stroke-dashoffset: 283; transform: rotate(0deg); }
+            50% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -283; transform: rotate(360deg); }
+        }
+
+        .loader-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+        }
+
+        .loading-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .loading-sub {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 40px;
+        }
+
+        .loading-logs {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .log-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.4s;
+        }
+
+        .log-item.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .log-item.active {
+            border-color: rgba(255, 107, 157, 0.3);
+            background: rgba(255, 107, 157, 0.05);
+            color: var(--text-secondary);
+        }
+
+        .log-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .log-item.active .log-dot {
+            background: var(--accent-pink);
+            box-shadow: 0 0 8px var(--accent-pink);
+        }
+
+        /* ===== 结果页 ===== */
+        .result-page .result-card {
+            padding: 48px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(255, 107, 157, 0.05), transparent 30%);
+            animation: slowRotate 15s linear infinite;
+        }
+
+        @keyframes slowRotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: rgba(255, 107, 157, 0.1);
+            border: 1px solid rgba(255, 107, 157, 0.2);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            color: var(--accent-pink);
+            margin-bottom: 24px;
+        }
+
+        .result-type {
+            font-size: clamp(3rem, 10vw, 5rem);
+            font-weight: 900;
+            letter-spacing: 8px;
+            background: linear-gradient(135deg, var(--accent-pink) 0%, var(--accent-purple) 50%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 0 20px rgba(255, 107, 157, 0.2));
+        }
+
+        .result-title {
+            font-size: clamp(1.3rem, 4vw, 1.8rem);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .result-emoji {
+            font-size: 4rem;
+            display: block;
+            margin: 24px 0;
+            filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.3));
+            animation: emojiFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes emojiFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .result-desc {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 36px;
+            max-width: 560px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 统计环形图 */
+        .stats-section {
+            margin-bottom: 32px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .stat-ring {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ring-wrapper {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .ring-wrapper svg {
+            transform: rotate(-90deg);
+        }
+
+        .ring-track {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.06);
+            stroke-width: 6;
+        }
+
+        .ring-fill {
+            fill: none;
+            stroke-width: 6;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .ring-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .ring-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* 信息卡片 */
+        .info-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 20px 24px;
+            text-align: left;
+            transition: all 0.3s;
+        }
+
+        .info-card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .info-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .info-card-header .icon {
+            font-size: 1.2rem;
+        }
+
+        .tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag-pill {
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 100px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+
+        .tag-pill:hover {
+            background: rgba(255, 107, 157, 0.1);
+            border-color: rgba(255, 107, 157, 0.3);
+            color: var(--accent-pink);
+        }
+
+        .info-text {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* 操作按钮 */
+        .action-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-action:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary-action {
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+            color: white;
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.25);
+        }
+
+        .btn-primary-action:hover {
+            box-shadow: 0 12px 35px rgba(255, 107, 157, 0.35);
+        }
+
+        /* 庆祝 */
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .confetti {
+            position: absolute;
+            animation: confettiFall 3s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* 入场动画类 */
+        .stagger-1 { animation: fadeUp 0.6s ease-out 0.1s both; }
+        .stagger-2 { animation: fadeUp 0.6s ease-out 0.2s both; }
+        .stagger-3 { animation: fadeUp 0.6s ease-out 0.3s both; }
+        .stagger-4 { animation: fadeUp 0.6s ease-out 0.4s both; }
+        .stagger-5 { animation: fadeUp 0.6s ease-out 0.5s both; }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 640px) {
+            .container {
+                padding: 16px;
+            }
+
+            .quiz-page .quiz-card,
+            .result-page .result-card {
+                padding: 28px 20px;
+                border-radius: 20px;
+            }
+
+            .letter-card {
+                width: 68px;
+                height: 88px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .ring-wrapper {
+                width: 70px;
+                height: 70px;
+            }
+
+            .action-row {
+                flex-direction: column;
+            }
+
+            .btn-action {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .quiz-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .progress-track {
+                width: 100%;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- SVG 渐变定义 -->
+    <svg width="0" height="0" style="position:absolute;">
+        <defs>
+            <linearGradient id="gradPink" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#ff6b9d"/>
+                <stop offset="100%" style="stop-color:#b347d9"/>
+            </linearGradient>
+            <linearGradient id="gradCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#00d4ff"/>
+                <stop offset="100%" style="stop-color:#06d6a0"/>
+            </linearGradient>
+            <linearGradient id="gradYellow" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#ffd166"/>
+                <stop offset="100%" style="stop-color:#ff6b9d"/>
+            </linearGradient>
+            <linearGradient id="gradPurple" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#b347d9"/>
+                <stop offset="100%" style="stop-color:#ff6b9d"/>
+            </linearGradient>
+            <linearGradient id="loaderGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#ff6b9d"/>
+                <stop offset="50%" style="stop-color:#b347d9"/>
+                <stop offset="100%" style="stop-color:#00d4ff"/>
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <!-- 背景 -->
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+    <div class="stars" id="stars"></div>
+
+    <div class="container">
+        <!-- ===== 首页 ===== -->
+        <div class="page home-page active" id="homePage">
+            <div class="home-badge">
+                <span>全新 2.0 版</span>
+            </div>
+
+            <div class="logo-wrapper">
+                <div class="logo-glow"></div>
+                <h1 class="logo">SBTI</h1>
+            </div>
+
+            <p class="subtitle">科学扯淡型人格测试</p>
+            <p class="subtitle-en">Scientific Bullshit Type Indicator</p>
+
+            <div class="letters-row">
+                <div class="letter-card">
+                    <span class="lt">S</span>
+                    <span class="lm">Sleepy</span>
+                </div>
+                <div class="letter-card">
+                    <span class="lt">B</span>
+                    <span class="lm">Broke</span>
+                </div>
+                <div class="letter-card">
+                    <span class="lt">T</span>
+                    <span class="lm">Tired</span>
+                </div>
+                <div class="letter-card">
+                    <span class="lt">I</span>
+                    <span class="lm">Idiot</span>
+                </div>
+            </div>
+
+            <p class="home-desc">
+                12 道精心瞎编的题目<br>
+                探索你灵魂深处最真实的摆烂人格
+            </p>
+
+            <button class="btn-glow" onclick="startQuiz()">
+                <span>开始测试</span>
+                <svg class="btn-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </button>
+
+            <div class="warning-pill">
+                <span>⚠️</span>
+                <span>仅供娱乐，结果可能比你的工资还无参考价值</span>
+            </div>
+        </div>
+
+        <!-- ===== 答题页 ===== -->
+        <div class="page quiz-page" id="quizPage">
+            <div class="glass-card quiz-card">
+                <div class="quiz-header">
+                    <div class="quiz-step">问题 <span id="qCurrent">1</span> / <span id="qTotal">12</span></div>
+                    <div class="progress-track">
+                        <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="question-area">
+                    <span class="q-emoji" id="qEmoji">🛌</span>
+                    <h2 class="q-text" id="qText">加载中...</h2>
+                </div>
+
+                <div class="options-list" id="optionsList"></div>
+
+                <nav class="quiz-nav" id="quizNav">
+                    <button class="nav-btn nav-prev" id="btnPrev" onclick="goToPrev()" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                        <span>上一题</span>
+                    </button>
+                    <div class="nav-dots" id="navDots"></div>
+                    <button class="nav-btn nav-next" id="btnNext" onclick="goToNext()">
+                        <span id="btnNextText">下一题</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- ===== 加载页 ===== -->
+        <div class="page loading-page" id="loadingPage">
+            <div class="glass-card loading-inner">
+                <div class="loader-ring">
+                    <svg width="100" height="100" viewBox="0 0 100 100">
+                        <circle class="loader-track" cx="50" cy="50" r="45"></circle>
+                        <circle class="loader-fill" cx="50" cy="50" r="45"></circle>
+                    </svg>
+                    <div class="loader-text">🧠</div>
+                </div>
+
+                <div class="loading-title">正在解析你的人格 DNA</div>
+                <div class="loading-sub">我们的量子 AI 正在高速瞎编中...</div>
+
+                <div class="loading-logs" id="loadingLogs"></div>
+            </div>
+        </div>
+
+        <!-- ===== 结果页 ===== -->
+        <div class="page result-page" id="resultPage">
+            <div class="glass-card result-card">
+                <div class="result-inner">
+                    <div class="result-badge">
+                        <span>✨ 你的 SBTI 类型</span>
+                    </div>
+
+                    <div class="result-type" id="rType">SBTI</div>
+                    <div class="result-title" id="rTitle">究极摆烂王</div>
+                    <span class="result-emoji" id="rEmoji">👑🛌</span>
+                    <p class="result-desc" id="rDesc">加载中...</p>
+
+                    <div class="stats-section">
+                        <div class="stats-grid" id="statsGrid"></div>
+                    </div>
+
+                    <div class="info-section">
+                        <div class="info-card stagger-1">
+                            <div class="info-card-header">
+                                <span class="icon">🏷️</span>
+                                <span>你的标签</span>
+                            </div>
+                            <div class="tag-row" id="rTags"></div>
+                        </div>
+
+                        <div class="info-card stagger-2">
+                            <div class="info-card-header">
+                                <span class="icon">💡</span>
+                                <span>人生建议</span>
+                            </div>
+                            <p class="info-text" id="rAdvice"></p>
+                        </div>
+
+                        <div class="info-card stagger-3">
+                            <div class="info-card-header">
+                                <span class="icon">🎯</span>
+                                <span>适合的职业</span>
+                            </div>
+                            <p class="info-text" id="rCareer"></p>
+                        </div>
+                    </div>
+
+                    <div class="action-row stagger-4">
+                        <button class="btn-action btn-secondary" onclick="restartQuiz()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="1 4 1 10 7 10"></polyline>
+                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                            </svg>
+                            <span>再测一次</span>
+                        </button>
+                        <button class="btn-action btn-primary-action" onclick="copyResult()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            <span>复制结果</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="celebration" id="celebration"></div>
+
+    <script>
+        // ===== 数据 =====
+        const questions = [
+            {
+                emoji: "🛌",
+                text: "周末早上你醒来，发现已经中午12点了，你的第一反应是？",
+                options: [
+                    { text: "继续睡，睡到自然醒才是尊重周末", scores: { s: 3, b: 0, t: 2, i: 1 } },
+                    { text: "虽然醒了，但要在床上刷3小时手机才起", scores: { s: 2, b: 0, t: 1, i: 2 } },
+                    { text: "立刻起床，周末也要保持高效！", scores: { s: 0, b: 0, t: 0, i: 0 } },
+                    { text: "开始焦虑，觉得一天又要废了", scores: { s: 1, b: 1, t: 3, i: 1 } }
+                ]
+            },
+            {
+                emoji: "💰",
+                text: "月底查看银行卡余额，发现还剩 200 块，你会？",
+                options: [
+                    { text: "省着点花，每天只吃馒头配榨菜", scores: { s: 0, b: 3, t: 2, i: 1 } },
+                    { text: "200块？先点个奶茶压压惊", scores: { s: 0, b: 3, t: 0, i: 3 } },
+                    { text: "打开花呗，人生苦短及时行乐", scores: { s: 0, b: 2, t: 0, i: 2 } },
+                    { text: "冷静规划，制定严格的省钱计划", scores: { s: 0, b: 1, t: 0, i: 0 } }
+                ]
+            },
+            {
+                emoji: "📱",
+                text: "朋友发来消息说聚会，但你已经换了睡衣躺好了，你会？",
+                options: [
+                    { text: "假装没看到，2小时后再回复\"刚在忙\"", scores: { s: 3, b: 0, t: 2, i: 2 } },
+                    { text: "直白地说\"不想动\"", scores: { s: 2, b: 0, t: 1, i: 1 } },
+                    { text: "虽然很累，但还是爬起来去了", scores: { s: 0, b: 0, t: 2, i: 1 } },
+                    { text: "说自己病了，然后在家打游戏", scores: { s: 2, b: 0, t: 1, i: 3 } }
+                ]
+            },
+            {
+                emoji: "🍜",
+                text: "外卖软件打开，面对满屏美食，你的选择是？",
+                options: [
+                    { text: "花40分钟选，最后点了常吃的那个", scores: { s: 1, b: 0, t: 1, i: 2 } },
+                    { text: "哪个满减最多点哪个", scores: { s: 0, b: 3, t: 1, i: 1 } },
+                    { text: "看了一个小时，不知道吃啥，不吃了", scores: { s: 2, b: 0, t: 3, i: 3 } },
+                    { text: "闭眼随便点一个，听天由命", scores: { s: 1, b: 0, t: 0, i: 3 } }
+                ]
+            },
+            {
+                emoji: "⏰",
+                text: "闹钟响了8遍，距离迟到还有10分钟，你会？",
+                options: [
+                    { text: "再睡5分钟，反正已经迟到了", scores: { s: 3, b: 0, t: 2, i: 3 } },
+                    { text: "弹射起床，头发不梳就冲出门", scores: { s: 0, b: 0, t: 2, i: 1 } },
+                    { text: "慢悠悠洗漱，大不了请个假", scores: { s: 2, b: 0, t: 1, i: 2 } },
+                    { text: "昨晚根本没定闹钟，完全醒不过来", scores: { s: 3, b: 0, t: 3, i: 3 } }
+                ]
+            },
+            {
+                emoji: "🛒",
+                text: "双11购物车里有20件商品，付尾款时你？",
+                options: [
+                    { text: "全部删除，反正买了也不用", scores: { s: 1, b: 3, t: 2, i: 0 } },
+                    { text: "分期付款，假装自己付得起", scores: { s: 0, b: 3, t: 1, i: 2 } },
+                    { text: "只买最便宜的3件，其他留给明年", scores: { s: 1, b: 2, t: 2, i: 1 } },
+                    { text: "冲动全部买下，收货后再后悔", scores: { s: 0, b: 2, t: 0, i: 3 } }
+                ]
+            },
+            {
+                emoji: "🎮",
+                text: "原本打算学习/工作，结果打开了游戏，你的内心OS是？",
+                options: [
+                    { text: "就打一把...（三小时后）...最后一把！", scores: { s: 1, b: 0, t: 0, i: 3 } },
+                    { text: "一边愧疚一边打，双重享受", scores: { s: 0, b: 0, t: 2, i: 2 } },
+                    { text: "学习个屁，人生得意须尽欢", scores: { s: 1, b: 0, t: 0, i: 2 } },
+                    { text: "打完这把真的去，骗你是小狗", scores: { s: 0, b: 0, t: 1, i: 3 } }
+                ]
+            },
+            {
+                emoji: "🍕",
+                text: "冰箱里只剩一个过期3天的披萨，你会？",
+                options: [
+                    { text: "闻一下，没异味就吃，胃酸会杀菌", scores: { s: 0, b: 3, t: 2, i: 3 } },
+                    { text: "纠结半小时，最后点了个外卖", scores: { s: 1, b: 2, t: 3, i: 1 } },
+                    { text: "扔掉，健康第一", scores: { s: 0, b: 1, t: 0, i: 0 } },
+                    { text: "放回冰箱，假装明天会买新的", scores: { s: 2, b: 2, t: 2, i: 2 } }
+                ]
+            },
+            {
+                emoji: "📧",
+                text: "邮箱里有20封未读工作邮件，你会？",
+                options: [
+                    { text: "全部标记已读，眼不见心不烦", scores: { s: 2, b: 0, t: 2, i: 3 } },
+                    { text: "先刷半小时抖音再处理", scores: { s: 2, b: 0, t: 1, i: 2 } },
+                    { text: "一封封认真回复，做个靠谱的人", scores: { s: 0, b: 0, t: 1, i: 0 } },
+                    { text: "关掉邮箱，假装公司倒闭了", scores: { s: 3, b: 0, t: 2, i: 3 } }
+                ]
+            },
+            {
+                emoji: "🏃",
+                text: "年初办了健身卡，现在已经半年没去过了，你会？",
+                options: [
+                    { text: "办都办了，明天一定去（第101次）", scores: { s: 1, b: 2, t: 1, i: 3 } },
+                    { text: "算了，当为健身房做慈善了", scores: { s: 1, b: 2, t: 2, i: 1 } },
+                    { text: "挂闲鱼卖掉，回点血", scores: { s: 0, b: 2, t: 1, i: 0 } },
+                    { text: "突然奋发图强，今天就去！", scores: { s: 0, b: 1, t: 0, i: 0 } }
+                ]
+            },
+            {
+                emoji: "🎬",
+                text: "周五晚上，你理想的状态是？",
+                options: [
+                    { text: "窝在被窝里追剧到睡着", scores: { s: 3, b: 0, t: 2, i: 0 } },
+                    { text: "叫外卖，打游戏，通宵嗨", scores: { s: 1, b: 1, t: 0, i: 1 } },
+                    { text: "整理房间，做个精致的人", scores: { s: 0, b: 0, t: 1, i: 0 } },
+                    { text: "躺平发呆，什么都不做", scores: { s: 3, b: 0, t: 3, i: 2 } }
+                ]
+            },
+            {
+                emoji: "🔮",
+                text: "如果有一台时光机，你最想对五年前的自己说什么？",
+                options: [
+                    { text: "多睡觉，以后就没机会了", scores: { s: 3, b: 0, t: 2, i: 1 } },
+                    { text: "别乱花钱，存点钱吧求你了", scores: { s: 0, b: 3, t: 1, i: 1 } },
+                    { text: "买房！全押比特币！", scores: { s: 0, b: 2, t: 0, i: 0 } },
+                    { text: "说啥也没用，你也不会听", scores: { s: 1, b: 0, t: 2, i: 3 } }
+                ]
+            }
+        ];
+
+        const personalityTypes = {
+            "SBTI": { title: "究极摆烂王", emoji: "👑🛌", desc: "恭喜！你达成了 SBTI 的终极形态——你不仅困、穷、累，而且对此有清醒的认知但拒绝改变。你是躺平界的珠穆朗玛峰，是摸鱼圈的传说级人物。", traits: ["人间清醒", "反内卷先锋", "床上的哲学家", "躺平艺术家"], advice: "你已经没有什么可以失去的了，所以尽情享受人生吧。记得按时吃饭，虽然可能吃不起。", career: "专业床上选手、职业发呆员、外卖评测师（仅看不买版）、云旅游达人" },
+            "SBTG": { title: "清醒的废物", emoji: "🧠🛌", desc: "你很聪明，完全知道自己为什么穷和累，但你选择了继续躺。你属于\"道理我都懂，但我就不动\"派。", traits: ["高智商废柴", "理论大师", "纸上谈兵王者", "清醒的沉沦者"], advice: "别让聪明只用在给自己找借口上，偶尔动一下，你会发现世界没你想的那么糟。", career: "评论家、弹幕分析师、深夜哲学家、知乎答主" },
+            "SBPI": { title: "打鸡血但没钱", emoji: "💪💸", desc: "你充满干劲，精力充沛，但钱包永远是空的。你是那种会为了一份免费午餐跑三公里的人。", traits: ["穷开心", "行动派", "钱包刺客", "乐观主义者"], advice: "热情是好事，但记得顺手搞点钱。钱不会自己长出来，虽然你好像一直在等奇迹。", career: "自由职业者、兼职达人、试用装收集者、砍价专家" },
+            "SBPG": { title: "潜力股但躺平", emoji: "⭐🛌", desc: "你拥有成功的所有要素：聪明、有干劲、有想法，但你选择在床上实现这一切。你是那种\"如果努力就会很厉害\"但从不验证这句话的人。", traits: ["潜力股", "纸上谈兵", "梦想家", "延迟行动者"], advice: "你离成功只差一个'起床'的距离。别再'明天再说'了，明天你也会这么说的。", career: "创业顾问（理论版）、投资人（嘴炮版）、计划制定专家" },
+            "SRTI": { title: "有钱但困死", emoji: "💰🛌", desc: "你莫名其妙地有点小钱，但你只想睡觉。你买最好的床垫、最贵的枕头、最舒服的睡衣，目的只有一个：更好地躺平。", traits: ["隐形富豪", "睡眠投资家", "躺平消费主义", "低调的享受者"], advice: "既然有钱，不如雇个人帮你起床？或者建一个可以躺着工作的办公室。", career: "睡眠博主、床上用品测评师、宅家经济推动者" },
+            "SRTG": { title: "低调人生赢家", emoji: "😎🛌", desc: "你有钱、聪明，还知道怎么舒服地活着。你是所有人羡慕但学不会的存在。你证明了：人生赢家不一定是站着赢的，躺着也能赢。", traits: ["隐形大佬", "低调奢华", "智慧型躺平", "人生赢家"], advice: "继续保持，但偶尔露个脸，让别人知道躺平也能成功，给世界一点希望。", career: "投资人、幕后顾问、睡衣品牌创始人、效率专家" },
+            "SRPI": { title: "迷糊的富二代", emoji: "🤴💸", desc: "你有精力、有钱，但有点迷糊。你经常做出一些令人费解的决定，比如花大价钱买一个没什么用的东西。但你很开心。", traits: ["快乐小迷糊", "有钱任性", "冲动消费", "天真烂漫"], advice: "找个聪明的人帮你管钱，你自己负责快乐就好。", career: "收藏家、网红、美食探店博主、生活方式KOL" },
+            "SRPG": { title: "天生赢家", emoji: "🏆✨", desc: "你精力充沛、有钱、聪明、还有行动力。说实话，你不应该出现在这个测试里。你是不是点错了？这是给 losers 准备的测试。", traits: ["天选之子", "别人家的孩子", "人生开挂", "完美人类"], advice: "别得意太早，小心乐极生悲。或者教教我们怎么做到的，做个人吧。", career: "CEO、创业者、任何你想做的事" },
+            "EBTI": { title: "憨憨社畜", emoji: "🐮😴", desc: "你精力充沛，但穷、累、且憨。你是公司最喜欢的员工——干得多、想得少、还便宜。你是社畜中的战斗机。", traits: ["老实人", "工具人", "背锅侠", "加班狂魔"], advice: "学会说'不'，学会摸鱼。你的精力是宝贵的，不要全部卖给公司。", career: "资深员工、团队老黄牛、救火队长、背锅专员" },
+            "EBTG": { title: "聪明但穷鬼", emoji: "🦉💸", desc: "你聪明、精力充沛，但 inexplicably 穷。你可能是个理想主义者，或者只是运气不好。你常常想：我这么聪明，为什么还是这么穷？", traits: ["怀才不遇", "理想主义", "聪明的穷光蛋", "知识分子的清高"], advice: "聪明需要变现。理想主义不能当饭吃，但聪明可以换来饭吃。", career: "学者、作家、独立研究员、自由职业者" },
+            "EBPI": { title: "元气穷鬼", emoji: "🌞💸", desc: "你每天都充满活力，每天都穷得开心。你是穷鬼中的阳光型选手，能把\"我没钱\"说得像\"我自由\"一样。", traits: ["穷开心", "阳光男孩/女孩", "正能量", "永不言弃"], advice: "把你的正能量卖个好价钱，这个世界需要更多像你这样的人。", career: "销售、客服、主播、健身教练、社区运营" },
+            "EBPG": { title: "奋斗逼", emoji: "🚀📈", desc: "你精力充沛、有干劲、还聪明。你是标准的奋斗逼，但也可能是未来的成功人士。你让周围的人都感到压力，但你不在乎。", traits: ["卷王", "奋斗逼", "自律狂魔", "目标导向"], advice: "别忘了休息，别把自己卷死了。成功很重要，但活着更重要。", career: "创业者、高管、咨询顾问、任何高薪高压工作" },
+            "ERTI": { title: "有钱但憨", emoji: "🤑🤪", desc: "你有钱、精力充沛，但有点憨。你经常被人忽悠买不需要的东西，或者做出一些令人啼笑皆非的决定。但你有钱，所以没关系。", traits: ["人傻钱多", "单纯", "快乐源泉", "移动的ATM"], advice: "找个靠谱的朋友帮你把关，不是所有人都是好人。但保持你的单纯，这个世界需要单纯的人。", career: "天使投资人、慈善家、直播打赏榜一大哥、收藏家" },
+            "ERTG": { title: "精英模板", emoji: "🎩💼", desc: "你有钱、精力充沛、还聪明。你是标准的精英模板，是社会的中流砥柱。你可能有点无聊，但你很成功。", traits: ["精英", "成功人士", "靠谱", "稳重"], advice: " loosen up 一点，偶尔憨一下也没关系。太完美会让人有距离感。", career: "高管、律师、医生、任何精英职业" },
+            "ERPI": { title: "快乐小富豪", emoji: "🌈💰", desc: "你有钱、精力充沛，虽然不太聪明，但谁在乎呢？你活得比大多数人都开心。你证明了：智商不是快乐的必要条件。", traits: ["快乐", "单纯", "阳光", "幸运儿"], advice: "继续保持你的快乐，但别乱投资。把钱存好，快乐一辈子。", career: "网红、主播、品牌代言人、生活方式博主" },
+            "ERPG": { title: "六边形战士", emoji: "🔱👑", desc: "你有钱、精力充沛、聪明、还有行动力。你是六边形战士，是完美的存在。你让其他15种人格都嫉妒得发狂。" }
+        };
+        personalityTypes["ERPG"].traits = ["完美", "六边形战士", "天选之子", "人生赢家"];
+        personalityTypes["ERPG"].advice = "你已经完美了，建议写本书教教我们。或者低调一点，免得被人嫉妒。";
+        personalityTypes["ERPG"].career = "任何你想做的事，你都会成功";
+
+        // ===== 初始化星空 =====
+        function initStars() {
+            const container = document.getElementById('stars');
+            for (let i = 0; i < 60; i++) {
+                const s = document.createElement('div');
+                s.className = 'star';
+                s.style.left = Math.random() * 100 + '%';
+                s.style.top = Math.random() * 100 + '%';
+                s.style.animationDelay = Math.random() * 3 + 's';
+                s.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                container.appendChild(s);
+            }
+        }
+        initStars();
+
+        // ===== 状态 =====
+        let currentQ = 0;
+        let scores = { s: 0, b: 0, t: 0, i: 0 };
+        let answers = new Array(12).fill(null); // 每道题所选选项的索引
+
+        // ===== 工具函数 =====
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function createRipple(e, btn) {
+            const rect = btn.getBoundingClientRect();
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple';
+            const size = Math.max(rect.width, rect.height);
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+            ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+            btn.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        function recalcScores() {
+            scores = { s: 0, b: 0, t: 0, i: 0 };
+            answers.forEach((ans, qi) => {
+                if (ans !== null) {
+                    const opt = questions[qi].options[ans];
+                    for (let k in opt.scores) scores[k] += opt.scores[k];
+                }
+            });
+        }
+
+        function allAnswered() {
+            return answers.every(a => a !== null);
+        }
+
+        // ===== 首页 =====
+        function startQuiz() {
+            currentQ = 0;
+            scores = { s: 0, b: 0, t: 0, i: 0 };
+            answers = new Array(12).fill(null);
+            showPage('quizPage');
+            renderQuestion();
+        }
+
+        // ===== 答题 =====
+        function renderQuestion() {
+            const q = questions[currentQ];
+            document.getElementById('qCurrent').textContent = currentQ + 1;
+            document.getElementById('qTotal').textContent = questions.length;
+            document.getElementById('qEmoji').textContent = q.emoji;
+            document.getElementById('qText').textContent = q.text;
+
+            const pct = (currentQ / questions.length) * 100;
+            document.getElementById('progressBar').style.width = pct + '%';
+
+            const prevAns = answers[currentQ];
+
+            const list = document.getElementById('optionsList');
+            list.innerHTML = '';
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                if (idx === prevAns) {
+                    btn.classList.add('chosen');
+                }
+                btn.innerHTML = `
+                    <div class="opt-index">${String.fromCharCode(65 + idx)}</div>
+                    <div class="opt-text">${opt.text}</div>
+                `;
+                btn.addEventListener('click', function(e) {
+                    createRipple(e, this);
+                    setTimeout(() => selectOption(idx), 250);
+                });
+                list.appendChild(btn);
+            });
+
+            updateNav();
+        }
+
+        function selectOption(idx) {
+            // 如果之前这道题选过，需要用 recalcScores 重新算分（扣掉旧的）
+            answers[currentQ] = idx;
+            recalcScores();
+
+            // 自动跳到下一题
+            if (currentQ < questions.length - 1) {
+                currentQ++;
+                renderQuestion();
+            } else {
+                document.getElementById('progressBar').style.width = '100%';
+                updateNav();
+                // 最后一题选完后不自动进加载，等用户点"查看结果"
+            }
+        }
+
+        function goToPrev() {
+            if (currentQ > 0) {
+                currentQ--;
+                renderQuestion();
+            }
+        }
+
+        function goToNext() {
+            if (currentQ < questions.length - 1) {
+                currentQ++;
+                renderQuestion();
+            } else {
+                // 最后一题，直接看结果
+                if (allAnswered()) {
+                    document.getElementById('progressBar').style.width = '100%';
+                    showLoading();
+                }
+            }
+        }
+
+        function updateNav() {
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+            const btnNextText = document.getElementById('btnNextText');
+            const dotsEl = document.getElementById('navDots');
+
+            // 上一题按钮
+            btnPrev.disabled = currentQ === 0;
+
+            // 下一题按钮文字
+            if (currentQ === questions.length - 1) {
+                if (allAnswered()) {
+                    btnNextText.textContent = '查看结果';
+                    btnNext.classList.add('nav-submit');
+                } else {
+                    btnNextText.textContent = '最后一题';
+                    btnNext.classList.remove('nav-submit');
+                }
+            } else {
+                btnNextText.textContent = '下一题';
+                btnNext.classList.remove('nav-submit');
+            }
+
+            // 导航圆点
+            dotsEl.innerHTML = '';
+            answers.forEach((ans, i) => {
+                const dot = document.createElement('div');
+                dot.className = 'nav-dot';
+                if (ans !== null) dot.classList.add('done');
+                if (i === currentQ) dot.classList.add('current');
+                dot.title = `第 ${i + 1} 题`;
+                dot.addEventListener('click', () => {
+                    currentQ = i;
+                    renderQuestion();
+                });
+                dotsEl.appendChild(dot);
+            });
+        }
+
+        // ===== 加载 =====
+        function showLoading() {
+            showPage('loadingPage');
+            const logs = [
+                "正在扫描你的睡眠记录...",
+                "正在接入你的银行卡余额...",
+                "正在测量你的黑眼圈深度...",
+                "正在检测你的智商余额...",
+                "正在向宇宙发送摆烂信号...",
+                "正在生成你的专属人设...",
+                "正在计算你还能躺多久..."
+            ];
+            const container = document.getElementById('loadingLogs');
+            container.innerHTML = '';
+
+            logs.forEach((text, i) => {
+                const div = document.createElement('div');
+                div.className = 'log-item';
+                div.innerHTML = `<div class="log-dot"></div><span>${text}</span>`;
+                container.appendChild(div);
+            });
+
+            let step = 0;
+            const items = container.querySelectorAll('.log-item');
+
+            function activateNext() {
+                if (step > 0) {
+                    items[step - 1].classList.remove('active');
+                    items[step - 1].querySelector('.log-dot').style.background = 'var(--accent-green)';
+                }
+                if (step < items.length) {
+                    items[step].classList.add('show', 'active');
+                    step++;
+                    setTimeout(activateNext, 350);
+                }
+            }
+
+            setTimeout(activateNext, 200);
+            setTimeout(showResult, 3000);
+        }
+
+        // ===== 结果 =====
+        function showResult() {
+            const type = calcType();
+            const info = personalityTypes[type];
+
+            document.getElementById('rType').textContent = type;
+            document.getElementById('rTitle').textContent = info.title;
+            document.getElementById('rEmoji').textContent = info.emoji;
+            document.getElementById('rDesc').textContent = info.desc;
+            document.getElementById('rAdvice').textContent = info.advice;
+            document.getElementById('rCareer').textContent = info.career;
+
+            // 标签
+            const tagsEl = document.getElementById('rTags');
+            tagsEl.innerHTML = '';
+            info.traits.forEach(t => {
+                const span = document.createElement('span');
+                span.className = 'tag-pill';
+                span.textContent = t;
+                tagsEl.appendChild(span);
+            });
+
+            // 环形统计
+            const max = 12;
+            const dims = [
+                { label: '困度', key: 's', grad: 'url(#gradPink)' },
+                { label: '穷度', key: 'b', grad: 'url(#gradYellow)' },
+                { label: '累度', key: 't', grad: 'url(#gradCyan)' },
+                { label: '憨度', key: 'i', grad: 'url(#gradPurple)' }
+            ];
+
+            const grid = document.getElementById('statsGrid');
+            grid.innerHTML = '';
+
+            dims.forEach((d, i) => {
+                const val = scores[d.key];
+                const pct = Math.min(Math.round((val / max) * 100), 100);
+                const r = 35;
+                const c = 2 * Math.PI * r;
+                const offset = c - (pct / 100) * c;
+
+                const div = document.createElement('div');
+                div.className = 'stat-ring';
+                div.innerHTML = `
+                    <div class="ring-wrapper">
+                        <svg width="80" height="80" viewBox="0 0 80 80">
+                            <circle class="ring-track" cx="40" cy="40" r="${r}"></circle>
+                            <circle class="ring-fill" cx="40" cy="40" r="${r}"
+                                stroke="${d.grad}"
+                                stroke-dasharray="${c}"
+                                stroke-dashoffset="${c}"></circle>
+                        </svg>
+                        <div class="ring-value">${pct}%</div>
+                    </div>
+                    <div class="ring-label">${d.label}</div>
+                `;
+                grid.appendChild(div);
+
+                setTimeout(() => {
+                    div.querySelector('.ring-fill').style.strokeDashoffset = offset;
+                }, 400 + i * 150);
+            });
+
+            showPage('resultPage');
+            launchConfetti();
+        }
+
+        function calcType() {
+            let t = '';
+            t += scores.s >= 6 ? 'S' : 'E';
+            t += scores.b >= 6 ? 'B' : 'R';
+            t += scores.t >= 6 ? 'T' : 'P';
+            t += scores.i >= 6 ? 'I' : 'G';
+            return t;
+        }
+
+        // ===== 彩带 =====
+        function launchConfetti() {
+            const c = document.getElementById('celebration');
+            c.innerHTML = '';
+            const colors = ['#ff6b9d', '#00d4ff', '#ffd166', '#06d6a0', '#b347d9', '#ff8fab'];
+            const shapes = ['50%', '0%', '50% 0 50% 50%'];
+
+            for (let i = 0; i < 100; i++) {
+                const el = document.createElement('div');
+                el.className = 'confetti';
+                el.style.left = Math.random() * 100 + '%';
+                el.style.top = '-5%';
+                el.style.width = (Math.random() * 8 + 4) + 'px';
+                el.style.height = (Math.random() * 8 + 4) + 'px';
+                el.style.background = colors[Math.floor(Math.random() * colors.length)];
+                el.style.borderRadius = shapes[Math.floor(Math.random() * shapes.length)];
+                el.style.animationDelay = Math.random() * 2 + 's';
+                el.style.animationDuration = (Math.random() * 2 + 2.5) + 's';
+                el.style.opacity = Math.random() * 0.5 + 0.5;
+                c.appendChild(el);
+            }
+            setTimeout(() => c.innerHTML = '', 5000);
+        }
+
+        function restartQuiz() {
+            showPage('homePage');
+        }
+
+        function copyResult() {
+            const type = document.getElementById('rType').textContent;
+            const title = document.getElementById('rTitle').textContent;
+            const desc = document.getElementById('rDesc').textContent;
+            const text = `🔮 我的 SBTI 人格类型是【${type} - ${title}】\n\n${desc}\n\n快来测测你的 SBTI 人格吧！`;
+
+            const ok = () => {
+                const btn = document.querySelector('.btn-primary-action');
+                const old = btn.innerHTML;
+                btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span>已复制</span>`;
+                setTimeout(() => btn.innerHTML = old, 2000);
+            };
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(ok);
+            } else {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                ok();
+            }
+        }
+    </script>
+</body>
+</html>
